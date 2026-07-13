@@ -5,42 +5,43 @@ phases:
     runtime-versions:
       java: corretto17
       python: 3.11
+
   build:
     commands:
-      - echo "Detecting user code submissions..."
-      # Exclude framework files to isolate user submitted code
-      - TARGET_FILE=$(find . -type f ! -name 'buildspec.yml' ! -name 'README.md' ! -name '.gitignore' ! -name 'pipeline-monitor.js' ! -path './.*' | head -n 1 | sed 's|^\./||')
-      - echo "Target file for execution Identified as $TARGET_FILE"
-      
+      - "echo Detecting user code submission..."
+      - 'TARGET_FILE=$(find . -type f \( -name "*.py" -o -name "*.java" \) | head -n 1)'
+      - 'echo "Target file: $TARGET_FILE"'
       - |
-        if [ -z "$TARGET_FILE" ]; then
-          echo "Error: No user execution code found in commit instance." > output.txt
-          exit 1
-        fi
-
-      # Execution Branching
-      - |
-        if [[ "$TARGET_FILE" == *.py ]]; then
-          python3 "$TARGET_FILE" > output.txt 2>&1
-        elif [[ "$TARGET_FILE" == *.java ]]; then
-          javac "$TARGET_FILE" > compiler_errors.txt 2>&1
-          if [ $? -eq 0 ]; then
-            CLASS_NAME=$(basename "$TARGET_FILE" .java)
-            java "$CLASS_NAME" > output.txt 2>&1
-          else
-            cat compiler_errors.txt > output.txt
-            # Force non-zero exit status to signify execution failure to the pipeline dashboard
+          if [ -z "$TARGET_FILE" ]; then
+            echo "Error: No Python or Java file found." > output.txt
             exit 1
           fi
-        else
-          echo "Error: Unsupported compilation extension format." > output.txt
-          exit 1
-        fi
+      - |
+          if [[ "$TARGET_FILE" == *.py ]]; then
+            python3 "$TARGET_FILE" > output.txt 2>&1
+          elif [[ "$TARGET_FILE" == *.java ]]; then
+            javac "$TARGET_FILE" > compiler_errors.txt 2>&1
+            if [ $? -eq 0 ]; then
+              CLASS_NAME=$(basename "$TARGET_FILE" .java)
+              java -cp "$(dirname "$TARGET_FILE")" "$CLASS_NAME" > output.txt 2>&1
+            else
+              cat compiler_errors.txt > output.txt
+              exit 1
+            fi
+          else
+            echo "Unsupported file type." > output.txt
+            exit 1
+          fi
 
   post_build:
     commands:
-      - TARGET_FILE=$(find . -type f ! -name 'buildspec.yml' ! -name 'README.md' ! -name '.gitignore' ! -name 'pipeline-monitor.js' ! -path './.*' | head -n 1 | sed 's|^\./||')
-      # Extract raw filename without extensions for clean lookup addressing
-      - FILE_BASE=$(basename "$TARGET_FILE")
-      # Upload execution log to S3 regardless of success/failure metrics
-      - aws s3 cp output.txt "s3://compiler-output-bucket-2026/outputs/${FILE_BASE}.txt"
+      - "echo ===== DEBUG ====="
+      - "aws sts get-caller-identity"
+      - "aws s3 ls s3://compiler-output-bucket-2026"
+      - 'FILE_BASE=$(basename "$TARGET_FILE")'
+      - 'echo "Uploading output.txt to S3..."'
+      - 'aws s3 cp output.txt s3://compiler-output-bucket-2026/outputs/${FILE_BASE}.txt'
+
+artifacts:
+  files:
+    - output.txt
