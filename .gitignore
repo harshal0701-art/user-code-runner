@@ -2,6 +2,7 @@
 *.log
 output.txt
 error.txt
+access.txt
 
 # OS metadata
 .DS_Store
