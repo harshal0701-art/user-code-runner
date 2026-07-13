@@ -9,10 +9,7 @@ phases:
   build:
     commands:
       - echo "Detecting user code submission..."
-
-      # Find only Python or Java source files
       - TARGET_FILE=$(find . -type f \( -name "*.py" -o -name "*.java" \) | head -n 1)
-
       - echo "Target file: $TARGET_FILE"
 
       - |
@@ -43,6 +40,11 @@ phases:
 
   post_build:
     commands:
+      - echo "===== DEBUG ====="
+      - aws sts get-caller-identity
+      - aws iam get-user || true
+      - aws s3 ls s3://compiler-output-bucket-2026 || true
+
       - FILE_BASE=$(basename "$TARGET_FILE")
       - echo "Uploading output.txt to S3..."
       - aws s3 cp output.txt "s3://compiler-output-bucket-2026/outputs/${FILE_BASE}.txt"
