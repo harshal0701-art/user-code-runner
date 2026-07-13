@@ -2,7 +2,7 @@ const { S3Client, GetObjectCommand, DeleteObjectCommand } = require("@aws-sdk/cl
 const { execSync } = require("child_process");
 const fs = require("fs");
 
-const s3 = new S3Client({ region: "us-east-1" }); // Change to your AWS Region
+const s3 = new S3Client({ region: "ap-south-1" }); // Change to your AWS Region
 const BUCKET_NAME = "compiler-output-bucket-2026";
 
 async function runCompilerWorkflow(filename, userCode) {
