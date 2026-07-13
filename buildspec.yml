@@ -9,7 +9,10 @@ phases:
   build:
     commands:
       - echo "Detecting user code submission..."
+
+      # Find the first Python or Java file
       - TARGET_FILE=$(find . -type f \( -name "*.py" -o -name "*.java" \) | head -n 1)
+
       - echo "Target file: $TARGET_FILE"
 
       - |
@@ -20,9 +23,11 @@ phases:
 
       - |
         if [[ "$TARGET_FILE" == *.py ]]; then
+          echo "Running Python file..."
           python3 "$TARGET_FILE" > output.txt 2>&1
 
         elif [[ "$TARGET_FILE" == *.java ]]; then
+          echo "Compiling Java file..."
           javac "$TARGET_FILE" > compiler_errors.txt 2>&1
 
           if [ $? -eq 0 ]; then
@@ -42,12 +47,10 @@ phases:
     commands:
       - echo "===== DEBUG ====="
       - aws sts get-caller-identity
-      - aws iam get-user || true
-      - aws s3 ls s3://compiler-output-bucket-2026 || true
-
+      - aws s3 ls s3://compiler-output-bucket-2026
       - FILE_BASE=$(basename "$TARGET_FILE")
       - echo "Uploading output.txt to S3..."
-      - aws s3 cp output.txt "s3://compiler-output-bucket-2026/outputs/${FILE_BASE}.txt"
+      - aws s3 cp output.txt s3://compiler-output-bucket-2026/outputs/${FILE_BASE}.txt
 
 artifacts:
   files:
