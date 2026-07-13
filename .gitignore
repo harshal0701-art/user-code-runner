@@ -1,0 +1,11 @@
+# Log files
+*.log
+output.txt
+error.txt
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Dynamic user code files (ignored locally so your EC2 script can handle them cleanly)
+*.class
