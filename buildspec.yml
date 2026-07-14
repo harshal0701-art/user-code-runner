@@ -11,7 +11,7 @@ phases:
       - 'echo "===== BUILD START ====="'
       - 'pwd'
       - 'ls -R'
-      - 'TARGET_FILE=$(find . -type f \( -name "*.py" -o -name "*.java" \) | head -n 1)'
+      - 'TARGET_FILE=$(find python java -type f \( -name "*.py" -o -name "*.java" \) 2>/dev/null | head -n 1)'
       - 'echo "Target File: $TARGET_FILE"'
       - 'if [ -z "$TARGET_FILE" ]; then echo "Error: No Python or Java file found." > output.txt; exit 1; fi'
       - |
