@@ -1,5 +1,5 @@
 // Make sure your class name matches the filename exactly!
-public class add {
+public class harshal {
     public static void main(String[] args) {
         int a = 5;
         int b = 10;
