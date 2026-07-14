@@ -15,21 +15,21 @@ phases:
       - echo "Target File: $TARGET_FILE"
       - if [ -z "$TARGET_FILE" ]; then echo "Error: No Python or Java file found." > output.txt; exit 1; fi
       - |
-        if [[ "$TARGET_FILE" == *.py ]]; then
-          python3 "$TARGET_FILE" > output.txt 2>&1
-        elif [[ "$TARGET_FILE" == *.java ]]; then
-          javac "$TARGET_FILE" > compiler_errors.txt 2>&1
-          if [ $? -eq 0 ]; then
-            CLASS_NAME=$(basename "$TARGET_FILE" .java)
-            java -cp "$(dirname "$TARGET_FILE")" "$CLASS_NAME" > output.txt 2>&1
+          if [[ "$TARGET_FILE" == *.py ]]; then
+            python3 "$TARGET_FILE" > output.txt 2>&1
+          elif [[ "$TARGET_FILE" == *.java ]]; then
+            javac "$TARGET_FILE" > compiler_errors.txt 2>&1
+            if [ $? -eq 0 ]; then
+              CLASS_NAME=$(basename "$TARGET_FILE" .java)
+              java -cp "$(dirname "$TARGET_FILE")" "$CLASS_NAME" > output.txt 2>&1
+            else
+              cat compiler_errors.txt > output.txt
+              exit 1
+            fi
           else
-            cat compiler_errors.txt > output.txt
+            echo "Unsupported file type." > output.txt
             exit 1
           fi
-        else
-          echo "Unsupported file type." > output.txt
-          exit 1
-        fi
 
   post_build:
     commands:
