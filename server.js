@@ -1,31 +1,36 @@
-const express = require('express');
-const path = require('path');
-// Import the workflow monitor logic function from pipeline-monitor.js
-const { runCompilerWorkflow } = require('./pipeline-monitor');
+const express = require("express");
+const path = require("path");
+
+const { runCompilerWorkflow } = require("./pipeline-monitor");
 
 const app = express();
-const PORT = process.env.PORT || 80; // Standard Web Port
 
-// Enable JSON parsing payload capacity
-app.use(express.json());
+const PORT = process.env.PORT || 80;
 
-// Serve static elements from public directory assets
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json({
+    limit: "5mb"
+}));
 
-// REST Endpoint linking UI trigger calls straight into the CodePipeline execution loop
-app.post('/api/compile', async (req, res) => {
+app.use(express.static(path.join(__dirname, "public")));
+
+app.post("/api/compile", async (req, res) => {
+
     const { filename, code } = req.body;
-    
+
     if (!filename || !code) {
-        return res.status(400).json({ success: false, output: "Error: Missing filename or code contents parameters." });
+        return res.status(400).json({
+            success: false,
+            output: "Filename and code are required."
+        });
     }
 
-    console.log(`Received compile request instance handling token for: ${filename}`);
-    const processResult = await runCompilerWorkflow(filename, code);
-    
-    res.json(processResult);
+    console.log(`Compiling ${filename}`);
+
+    const result = await runCompilerWorkflow(filename, code);
+
+    res.json(result);
 });
 
 app.listen(PORT, () => {
-    console.log(`EC2 Web Compiler Server operational platform listening on port: ${PORT}`);
+    console.log(`Compiler server running on port ${PORT}`);
 });
