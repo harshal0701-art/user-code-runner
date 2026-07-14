@@ -8,39 +8,48 @@ phases:
 
   build:
     commands:
-      - "echo Detecting user code submission..."
-      - 'TARGET_FILE=$(find . -type f \( -name "*.py" -o -name "*.java" \) | head -n 1)'
-      - 'echo "Target file: $TARGET_FILE"'
+      - echo "===== BUILD START ====="
+      - pwd
+      - ls -R
+
+      # Find the uploaded source file
+      - TARGET_FILE=$(find . -type f \( -name "*.py" -o -name "*.java" \) | head -n 1)
+      - echo "Target File: $TARGET_FILE"
+
       - |
-          if [ -z "$TARGET_FILE" ]; then
-            echo "Error: No Python or Java file found." > output.txt
-            exit 1
-          fi
+        if [ -z "$TARGET_FILE" ]; then
+          echo "Error: No Python or Java file found." > output.txt
+          exit 1
+        fi
+
       - |
-          if [[ "$TARGET_FILE" == *.py ]]; then
-            python3 "$TARGET_FILE" > output.txt 2>&1
-          elif [[ "$TARGET_FILE" == *.java ]]; then
-            javac "$TARGET_FILE" > compiler_errors.txt 2>&1
-            if [ $? -eq 0 ]; then
-              CLASS_NAME=$(basename "$TARGET_FILE" .java)
-              java -cp "$(dirname "$TARGET_FILE")" "$CLASS_NAME" > output.txt 2>&1
-            else
-              cat compiler_errors.txt > output.txt
-              exit 1
-            fi
+        if [[ "$TARGET_FILE" == *.py ]]; then
+          echo "Executing Python..."
+          python3 "$TARGET_FILE" > output.txt 2>&1
+
+        elif [[ "$TARGET_FILE" == *.java ]]; then
+          echo "Compiling Java..."
+          javac "$TARGET_FILE" > compiler_errors.txt 2>&1
+
+          if [ $? -eq 0 ]; then
+            CLASS_NAME=$(basename "$TARGET_FILE" .java)
+            java -cp "$(dirname "$TARGET_FILE")" "$CLASS_NAME" > output.txt 2>&1
           else
-            echo "Unsupported file type." > output.txt
+            cat compiler_errors.txt > output.txt
             exit 1
           fi
+        fi
 
   post_build:
     commands:
-      - "echo ===== DEBUG ====="
-      - "aws sts get-caller-identity"
-      - "aws s3 ls s3://compiler-output-bucket-2026"
-      - 'FILE_BASE=$(basename "$TARGET_FILE")'
-      - 'echo "Uploading output.txt to S3..."'
-      - 'aws s3 cp output.txt s3://compiler-output-bucket-2026/outputs/${FILE_BASE}.txt'
+      - echo "===== POST BUILD ====="
+      - aws sts get-caller-identity
+      - aws s3 ls s3://compiler-output-bucket-2026
+
+      - FILE_NAME=$(basename "$TARGET_FILE")
+
+      - echo "Uploading output..."
+      - aws s3 cp output.txt s3://compiler-output-bucket-2026/outputs/${FILE_NAME}.txt
 
 artifacts:
   files:
