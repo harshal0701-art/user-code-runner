@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 version: 0.2
 
 phases:
@@ -95,4 +95,3 @@ phases:
 artifacts:
   files:
     - output.txt
->>>>>>> f6263aba30466a63db2d2770e19267dc7bb65cbf
