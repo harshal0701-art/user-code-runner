@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 version: 0.2
 
 phases:
@@ -42,3 +43,56 @@ phases:
 artifacts:
   files:
     - output.txt
+=======
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+      java: corretto17
+
+  build:
+    commands:
+      - 'echo "===== BUILD START ====="'
+      - 'pwd'
+      - 'ls -R'
+      - 'TARGET_FILE=$(find python java -type f \( -name "*.py" -o -name "*.java" \) 2>/dev/null | head -n 1)'
+      - 'echo "Target File: $TARGET_FILE"'
+      - 'if [ -z "$TARGET_FILE" ]; then echo "Error: No Python or Java file found." > output.txt; exit 1; fi'
+      - |
+        case "$TARGET_FILE" in
+          *.py)
+            echo "Running Python..."
+            python3 "$TARGET_FILE" > output.txt 2>&1
+            ;;
+          *.java)
+            echo "Running Java..."
+            javac "$TARGET_FILE" > compiler_errors.txt 2>&1
+            if [ $? -eq 0 ]; then
+              CLASS_NAME=$(basename "$TARGET_FILE" .java)
+              java -cp "$(dirname "$TARGET_FILE")" "$CLASS_NAME" > output.txt 2>&1
+            else
+              cat compiler_errors.txt > output.txt
+              exit 1
+            fi
+            ;;
+          *)
+            echo "Unsupported file type." > output.txt
+            exit 1
+            ;;
+        esac
+
+  post_build:
+    commands:
+      - 'echo "===== POST BUILD ====="'
+      - 'aws sts get-caller-identity'
+      - 'aws s3 ls s3://compiler-output-bucket-2026'
+      - 'FILE_NAME=$(basename "$TARGET_FILE")'
+      - 'echo "Uploading output.txt..."'
+      - 'aws s3 cp output.txt s3://compiler-output-bucket-2026/outputs/${FILE_NAME}.txt'
+
+artifacts:
+  files:
+    - output.txt
+>>>>>>> f6263aba30466a63db2d2770e19267dc7bb65cbf
