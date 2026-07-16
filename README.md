@@ -6,6 +6,7 @@
 
 <p align="center">
 
+[![Live Demo](https://img.shields.io/badge/🌐-Live_Demo-success?style=for-the-badge)](http://15.206.149.86/)
 ![AWS](https://img.shields.io/badge/AWS-Cloud-orange?style=for-the-badge&logo=amazonaws)
 ![NodeJS](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -13,9 +14,21 @@
 ![AWS CodeBuild](https://img.shields.io/badge/AWS-CodeBuild-FF9900?style=for-the-badge)
 ![AWS CodePipeline](https://img.shields.io/badge/AWS-CodePipeline-FF9900?style=for-the-badge)
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)
-![Apache](https://img.shields.io/badge/Apache-D22128?style=for-the-badge&logo=apache&logoColor=white)
+![PM2](https://img.shields.io/badge/PM2-2B037A?style=for-the-badge)
 
 </p>
+
+---
+
+# 🌐 Live Demo
+
+## 🚀 Production Application
+
+**Live URL**
+
+http://15.206.149.86/
+
+> The application is deployed on an **Amazon EC2** instance with the backend managed by **PM2**, while **Amazon S3**, **AWS CodeBuild**, and **AWS CodePipeline** handle cloud-based code execution and automated deployment.
 
 ---
 
@@ -23,11 +36,26 @@
 
 The **Cloud-Based Online Code Compiler** is a production-inspired cloud application that enables users to write, compile, and execute **Java** and **Python** programs directly from a web browser.
 
-Unlike traditional online compilers that execute code on a local server, this project uses **Amazon Web Services (AWS)** to securely process code execution in an isolated cloud environment.
+Unlike traditional online compilers that execute code on a local server, this project leverages **Amazon Web Services (AWS)** to securely process code execution in an isolated cloud environment.
 
-When users submit code, the application uploads it to **Amazon S3**, triggers **AWS CodeBuild** to compile and execute the program, and returns the output to the frontend. The deployment pipeline is fully automated using **AWS CodePipeline** integrated with **GitHub**.
+When users submit code, the application uploads it to **Amazon S3**, triggers **AWS CodeBuild** to compile and execute the program, and returns the output to the frontend. The deployment pipeline is fully automated using **AWS CodePipeline** integrated with **GitHub**. The application is continuously hosted on an **Amazon EC2** instance with the backend managed by **PM2**.
 
 This architecture demonstrates cloud-native application development, CI/CD automation, scalable backend processing, and secure code execution.
+
+---
+
+# 🏆 Project Highlights
+
+- 🌐 Live production deployment on Amazon EC2
+- ☁️ Cloud-native code execution using AWS CodeBuild
+- 📂 Source code stored securely in Amazon S3
+- 🔄 Automated CI/CD with AWS CodePipeline
+- 🚀 Continuous backend hosting using PM2
+- 💻 REST API backend using Express.js
+- ⚡ Supports Java and Python code execution
+- 🔒 Secure AWS IAM integration
+- 📈 Production-inspired cloud architecture
+- 📱 Responsive web interface
 
 ---
 
@@ -57,8 +85,8 @@ This architecture demonstrates cloud-native application development, CI/CD autom
 | AWS CodePipeline | Automates deployment |
 | IAM | Secure AWS permissions |
 | CloudWatch | Build logs and monitoring |
-| EC2 | Hosts the application |
-| pm2 | Serves the frontend |
+| Amazon EC2 | Hosts the application |
+| PM2 | Keeps the backend running continuously |
 
 ---
 
@@ -83,6 +111,7 @@ This architecture demonstrates cloud-native application development, CI/CD autom
 - Amazon EC2
 - IAM
 - CloudWatch
+- PM2
 
 ---
 
@@ -92,7 +121,6 @@ This architecture demonstrates cloud-native application development, CI/CD autom
                     +----------------------+
                     |      Web Browser     |
                     +----------+-----------+
-                               |
                                |
                                ▼
                      Express.js Backend
@@ -135,7 +163,10 @@ AWS CodePipeline
 AWS CodeBuild
      │
      ▼
-Amazon EC2 Deployment
+Amazon EC2 (PM2)
+     │
+     ▼
+Live Application
 ```
 
 ---
@@ -162,7 +193,7 @@ Backend uploads the source file to Amazon S3.
 
 ### Step 4
 
-AWS CodeBuild downloads the file.
+AWS CodeBuild downloads the source code.
 
 ⬇️
 
@@ -190,14 +221,13 @@ The backend retrieves the output and displays it to the user.
 user-code-runner/
 │
 ├── public/
-│   ├── index.html
+│   └── index.html
 │
 ├── screenshots/
 │   ├── home.png
 │   ├── code-editor.png
 │   ├── output.png
-│   ├── codepipeline.png
-│   
+│   └── codepipeline.png
 │
 ├── server.js
 ├── pipeline-monitor.js
@@ -224,7 +254,6 @@ user-code-runner/
 
 ---
 
-
 ## 📄 Output
 
 ![Output](screenshots/output.png)
@@ -236,8 +265,6 @@ user-code-runner/
 ![Pipeline](screenshots/codepipeline.png)
 
 ---
-
-
 
 # 🚀 Installation
 
@@ -265,6 +292,12 @@ Start the server:
 npm start
 ```
 
+Or run using PM2:
+
+```bash
+pm2 start server.js --name code-compiler
+```
+
 Open your browser:
 
 ```
@@ -275,21 +308,26 @@ http://localhost:3000
 
 # ☁️ Deployment
 
-1. Launch an Amazon EC2 instance.
-2. Install Apache and Node.js.
-3. Configure IAM permissions.
-4. Create an Amazon S3 bucket.
-5. Configure an AWS CodeBuild project.
-6. Create an AWS CodePipeline connected to GitHub.
-7. Deploy the application.
-8. Access it using the EC2 public IP.
+The application is deployed using the following AWS infrastructure:
+
+- Amazon EC2 – Hosts the application
+- PM2 – Keeps the Node.js backend running continuously
+- Amazon S3 – Stores uploaded source code
+- AWS CodeBuild – Compiles and executes Java/Python programs
+- AWS CodePipeline – Automates deployment from GitHub
+- CloudWatch – Build logs and monitoring
+- IAM – Secure access management
+
+## Production URL
+
+http://15.206.149.86/
 
 ---
 
 # 🔐 Security
 
-- IAM Role-based Access
-- Cloud Build Isolation
+- IAM Role-based Access Control
+- Isolated Code Execution using AWS CodeBuild
 - Source Code Stored Securely in Amazon S3
 - No Persistent Code Storage on the Web Server
 - Build Logs Managed with CloudWatch
@@ -304,6 +342,7 @@ The architecture is designed to scale by leveraging managed AWS services:
 - Automated deployment pipeline
 - Object storage with Amazon S3
 - Cloud-native execution workflow
+- Easily extendable to support additional programming languages
 
 ---
 
@@ -328,7 +367,8 @@ The architecture is designed to scale by leveraging managed AWS services:
 - Automated Deployment
 - Express.js Backend Development
 - Cloud Security with IAM
-- Production Deployment on EC2
+- Production Deployment on Amazon EC2
+- Process Management with PM2
 
 ---
 
@@ -376,6 +416,19 @@ If you found this project helpful:
 # 📄 License
 
 This project is licensed under the MIT License.
+
+---
+
+# 💼 Portfolio Recommendation
+
+For a more professional deployment, consider using:
+
+- An AWS Elastic IP for a permanent public address
+- A custom domain such as **compiler.harshalcloud.dev**
+- HTTPS using an SSL certificate (Let's Encrypt or AWS Certificate Manager)
+- Nginx as a reverse proxy in front of the Node.js application
+
+These enhancements improve reliability, security, and create a more polished portfolio project for recruiters and clients.
 
 ---
 
